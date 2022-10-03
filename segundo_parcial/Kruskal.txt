@@ -1,0 +1,93 @@
+from cProfile import label
+from nntplib import ArticleInfo
+import networkx as nx
+import graphviz
+import numpy as np
+G = nx.Graph()
+K = nx.Graph()
+pesofinal=0
+aristas=[]
+adayacente=np.array([
+    [0,1,13,6,0,0,0,0],
+    [1,0,5,14,3,0,0,0],
+    [13,5,0,0,4,0,0,15],
+    [6,14,0,0,0,7,9,0],
+    [0,3,4,0,0,0,11,8],
+    [0,0,0,7,0,0,2,16],
+    [0,0,0,9,11,2,0,10],
+    [0,0,15,0,8,16,10,0],
+
+])
+def intersection(lst1, lst2): 
+    lst3 = [value for value in lst1 if value in lst2] 
+    return lst3 
+
+def ciclo(punto,grafo):
+    coincidencia1=[];
+    coincidencia2=[];
+    for i in range(len(grafo)):
+        if(punto[0] == grafo[i][0]):
+            coincidencia1.append(grafo[i][1])
+        if(punto[0] == grafo[i][1]):
+            coincidencia1.append(grafo[i][0])
+    for i in range(len(grafo)):
+        if(punto[1] == grafo[i][0]):
+            coincidencia2.append(grafo[i][1])
+        if(punto[1] == grafo[i][1]):
+            coincidencia2.append(grafo[i][0])
+    return len(intersection(coincidencia1,coincidencia2))>0
+
+
+kruskal = np.zeros((len(adayacente),len(adayacente[0])))
+for n in range(len(adayacente)):
+    menor=float("inf");
+    menorxy=[0,0]
+    for n in range(len(adayacente)):
+        for i in range(len(adayacente[n])):
+            if adayacente[n][i]>0:
+                if adayacente[n][i]<menor:
+                    menor=adayacente[n][i]
+                    menorxy=[i,n];
+                    menorxyChar=[chr(i+97),chr(n+97)]
+    
+    if  not ciclo(menorxyChar,aristas):
+        adayacente[menorxy[1]][menorxy[0]]=0
+        adayacente[menorxy[0]][menorxy[1]]=0
+        if True:
+            kruskal[menorxy[1]][menorxy[0]]=menor
+            pesofinal+=menor
+            aristas.append(menorxyChar)
+    else:
+        adayacente[menorxy[1]][menorxy[0]]=0
+        adayacente[menorxy[0]][menorxy[1]]=0
+    
+for n in range(len(kruskal)):
+    for i in range(len(kruskal[n])):
+        if kruskal[n][i]>0:
+            K.add_edge(chr(n+97), chr(i+97), label=str(kruskal[n][i]))
+
+for n in range(len(adayacente)):
+    for i in range(len(adayacente[n])):
+        if adayacente[n][i]>0:
+            G.add_edge(chr(n+97), chr(i+97), label=str(adayacente[n][i]))
+
+for n in range(len(adayacente)):
+    G.add_node(chr(97+n))
+for n in range(len(kruskal)):
+    K.add_node(chr(97+n))
+
+for n in range(len(adayacente)):
+    for i in range(len(adayacente[n])):
+        if adayacente[n][i]>0:
+            G.add_edge(chr(n+97), chr(i+97), label=str(adayacente[n][i]))
+
+for n in range(len(kruskal)):
+    for i in range(len(kruskal[n])):
+        if kruskal[n][i]>0:
+            K.add_edge(chr(n+97), chr(i+97), label=str(kruskal[n][i]))
+ 
+A = nx.nx_agraph.to_agraph(K)
+A.layout('dot')
+print("peso total: ",pesofinal) 
+graphviz.Source(A.to_string()) 
+# A.draw('salida.png') # guardar como png

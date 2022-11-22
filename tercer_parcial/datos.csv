@@ -1,0 +1,8 @@
+puntualidad,participacion,aprovechamiento,nota
+no asiste,media,excelente,exento
+asiste,alta,bueno,exento
+no asiste,media,bueno,final
+no asiste,baja,bueno,final
+asiste,alta,regular,final
+asiste,baja,deficiente,extraordinario
+no asiste,media,regular,extraordinario
